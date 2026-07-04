@@ -8,6 +8,9 @@ interface User {
   email: string;
   branch: string;
   year: number;
+  gender: string;
+  phone: string;
+  bio?: string;
   isVerified: boolean;
 }
 

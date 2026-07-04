@@ -20,3 +20,21 @@ export const loginSchema = z.object({
 });
 
 export type SignupInput = z.infer<typeof signupSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2).optional(),
+  branch: z.string().min(1).optional(),
+  year: z.number().min(1).max(5).optional(),
+  bio: z.string().max(200).optional(),
+  phone: z.string().min(10).optional(),
+});
+export const createRideRequestSchema = z.object({
+  pickup: z.string().min(2, "Pickup location is required"),
+  destination: z.string().min(2, "Destination is required"),
+  travelDateTime: z.coerce.date().refine((date) => date > new Date(), {
+    message: "Travel date/time must be in the future",
+  }),
+  peopleNeeded: z.number().min(1).max(10),
+  genderPreference: z.enum(["anyone", "men", "women"]).default("anyone"),
+  notes: z.string().max(300).optional(),
+});

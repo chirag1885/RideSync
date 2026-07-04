@@ -1,5 +1,5 @@
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -18,12 +18,17 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold text-gray-900">Welcome, {user?.name}</h1>
             <p className="text-sm text-gray-500">{user?.email}</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-red-500 hover:underline"
-          >
-            Log out
-          </button>
+          <div className="flex gap-4 items-center">
+            <Link to="/profile" className="text-sm text-purple-600 hover:underline">
+              Edit Profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="text-sm text-red-500 hover:underline"
+            >
+              Log out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
