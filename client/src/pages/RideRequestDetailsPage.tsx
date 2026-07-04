@@ -1,14 +1,25 @@
 import { useParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRideRequestByIdApi } from "../lib/rideRequestApi";
+import { createJoinRequestApi } from "../lib/joinRequestApi";
+import { useAuth } from "../context/AuthContext";
 
 export default function RideRequestDetailsPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["rideRequest", id],
     queryFn: () => getRideRequestByIdApi(id!),
     enabled: !!id,
+  });
+
+  const joinMutation = useMutation({
+    mutationFn: () => createJoinRequestApi(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rideRequest", id] });
+    },
   });
 
   if (isLoading) {
@@ -25,6 +36,7 @@ export default function RideRequestDetailsPage() {
 
   const r = data.data.rideRequest;
   const dateObj = new Date(r.travelDateTime);
+  const isOwnRequest = r.creator?._id === user?.id;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -67,12 +79,35 @@ export default function RideRequestDetailsPage() {
           </div>
         )}
 
-        <button
-          disabled
-          className="w-full bg-purple-600 opacity-50 cursor-not-allowed text-white font-medium rounded-lg py-2.5 text-sm"
-        >
-          I'm Interested (coming soon)
-        </button>
+        {isOwnRequest ? (
+          <Link
+            to={`/ride-requests/${id}/requests`}
+            className="block text-center bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg py-2.5 text-sm transition"
+          >
+            View Join Requests
+          </Link>
+        ) : (
+          <>
+            {joinMutation.isSuccess ? (
+              <p className="text-center text-green-600 text-sm font-medium py-2.5">
+                Interest sent! Waiting for the creator to respond.
+              </p>
+            ) : (
+              <button
+                onClick={() => joinMutation.mutate()}
+                disabled={joinMutation.isPending}
+                className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium rounded-lg py-2.5 text-sm transition"
+              >
+                {joinMutation.isPending ? "Sending..." : "I'm Interested"}
+              </button>
+            )}
+            {joinMutation.isError && (
+              <p className="text-red-500 text-sm mt-2 text-center">
+                {(joinMutation.error as any)?.response?.data?.message || "Failed to send interest"}
+              </p>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

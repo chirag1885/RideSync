@@ -7,7 +7,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import rideRequestRoutes from "./routes/rideRequestRoutes";
 import joinRequestRoutes from "./routes/joinRequestRoutes";
-
+import chatRoutes from "./routes/chatRoutes";
 dotenv.config();
 
 const app = express();
@@ -25,6 +25,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ride-requests", rideRequestRoutes);
 app.use("/api/join-requests", joinRequestRoutes);
+app.use("/api/chats", chatRoutes);
 
 const PORT = process.env.PORT || 5000;
 

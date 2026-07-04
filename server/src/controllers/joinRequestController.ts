@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { JoinRequest } from "../models/JoinRequest";
 import { RideRequest } from "../models/RideRequest";
+import { Chat } from "../models/Chat";
 
 export const createJoinRequest = async (req: Request, res: Response) => {
   try {
@@ -96,7 +97,26 @@ export const respondToJoinRequest = async (req: Request, res: Response) => {
     joinRequest.status = action === "accept" ? "accepted" : "rejected";
     await joinRequest.save();
 
-    return res.status(200).json({ message: `Join request ${joinRequest.status}`, joinRequest });
+    let chat = null;
+    if (action === "accept") {
+      chat = await Chat.findOne({
+        rideRequest: rideRequest._id,
+        participants: { $all: [rideRequest.creator, joinRequest.requester] },
+      });
+
+      if (!chat) {
+        chat = await Chat.create({
+          rideRequest: rideRequest._id,
+          participants: [rideRequest.creator, joinRequest.requester],
+        });
+      }
+    }
+
+    return res.status(200).json({
+      message: `Join request ${joinRequest.status}`,
+      joinRequest,
+      chat,
+    });
   } catch (error) {
     console.error("Respond to join request error:", error);
     return res.status(500).json({ message: "Something went wrong" });

@@ -45,6 +45,9 @@ export default function DashboardPage() {
             <Link to="/profile" className="text-sm text-purple-600 hover:underline">
               Edit Profile
             </Link>
+            <Link to="/my-requests" className="text-sm text-purple-600 hover:underline">
+              My Requests
+            </Link>
             <button onClick={handleLogout} className="text-sm text-red-500 hover:underline">
               Log out
             </button>

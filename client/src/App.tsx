@@ -8,6 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
 import CreateRequestPage from "./pages/CreateRequestPage";
 import RideRequestDetailsPage from "./pages/RideRequestDetailsPage";
+import ManageJoinRequestsPage from "./pages/ManageJoinRequestsPage";
+import MyRequestsPage from "./pages/MyRequestsPage";
 
 function App() {
   return (
@@ -40,6 +42,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <RideRequestDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ride-requests/:id/requests"
+            element={
+              <ProtectedRoute>
+                <ManageJoinRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-requests"
+            element={
+              <ProtectedRoute>
+                <MyRequestsPage />
               </ProtectedRoute>
             }
           />
