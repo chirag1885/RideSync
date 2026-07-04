@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
 import SignupPage from "./pages/SignupPage";
 import VerifyOtpPage from "./pages/VerifyOtpPage";
 import LoginPage from "./pages/LoginPage";
@@ -16,6 +17,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/signup" element={<SignupPage />} />
