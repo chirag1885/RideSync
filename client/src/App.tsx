@@ -1,8 +1,20 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import SignupPage from "./pages/SignupPage";
+import VerifyOtpPage from "./pages/VerifyOtpPage";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <h1 className="text-3xl font-bold text-gray-900">RideSync</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/verify-otp" element={<VerifyOtpPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
