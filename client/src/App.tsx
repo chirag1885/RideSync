@@ -10,7 +10,8 @@ import CreateRequestPage from "./pages/CreateRequestPage";
 import RideRequestDetailsPage from "./pages/RideRequestDetailsPage";
 import ManageJoinRequestsPage from "./pages/ManageJoinRequestsPage";
 import MyRequestsPage from "./pages/MyRequestsPage";
-
+import ChatListPage from "./pages/ChatListPage";
+import ChatWindowPage from "./pages/ChatWindowPage";
 function App() {
   return (
     <AuthProvider>
@@ -58,6 +59,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chats"
+            element={
+              <ProtectedRoute>
+                <ChatListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chats/:chatId"
+            element={
+              <ProtectedRoute>
+                <ChatWindowPage />
               </ProtectedRoute>
             }
           />
