@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
+import CreateRequestPage from "./pages/CreateRequestPage";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}/>
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route
             path="/dashboard"
             element={
@@ -24,7 +25,14 @@ function App() {
                 <DashboardPage />
               </ProtectedRoute>
             }
-            
+          />
+          <Route
+            path="/create-request"
+            element={
+              <ProtectedRoute>
+                <CreateRequestPage />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </BrowserRouter>

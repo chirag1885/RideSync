@@ -31,6 +31,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <Link
+          to="/create-request"
+          className="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg px-4 py-2 mb-4"
+        >
+          + Create Ride Request
+        </Link>
+
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-gray-500">Branch</p>
