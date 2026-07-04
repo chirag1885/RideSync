@@ -6,6 +6,7 @@ import { connectDB } from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import rideRequestRoutes from "./routes/rideRequestRoutes";
+import joinRequestRoutes from "./routes/joinRequestRoutes";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ride-requests", rideRequestRoutes);
+app.use("/api/join-requests", joinRequestRoutes);
 
 const PORT = process.env.PORT || 5000;
 

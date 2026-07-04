@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
 import CreateRequestPage from "./pages/CreateRequestPage";
+import RideRequestDetailsPage from "./pages/RideRequestDetailsPage";
 
 function App() {
   return (
@@ -31,6 +32,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateRequestPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ride-requests/:id"
+            element={
+              <ProtectedRoute>
+                <RideRequestDetailsPage />
               </ProtectedRoute>
             }
           />
