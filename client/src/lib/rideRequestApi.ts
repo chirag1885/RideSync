@@ -27,3 +27,6 @@ export const getRideRequestsApi = (filters?: RideRequestFilters) => {
 export const getRideRequestByIdApi = (id: string) => {
   return api.get(`/ride-requests/${id}`);
 };
+export const deleteRideRequestApi = (id: string) => {
+  return api.delete(`/ride-requests/${id}`);
+};

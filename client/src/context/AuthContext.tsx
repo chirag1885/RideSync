@@ -35,12 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     getMeApi()
-      .then((res) => setUser(res.data.user))
-      .catch(() => {
-        localStorage.removeItem("token");
-        setUser(null);
-      })
-      .finally(() => setIsLoading(false));
+  .then((res) => {
+    const u = res.data.user;
+    setUser({ ...u, id: u._id ?? u.id });
+  })
+  .catch(() => {
+    localStorage.removeItem("token");
+    setUser(null);
+  })
+  .finally(() => setIsLoading(false));
   }, []);
 
   const login = (token: string, userData: User) => {

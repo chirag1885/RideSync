@@ -6,6 +6,7 @@ export interface IJoinRequest extends Document {
   status: "pending" | "accepted" | "rejected";
   createdAt: Date;
   updatedAt: Date;
+  message?: string;
 }
 
 const joinRequestSchema = new Schema<IJoinRequest>(
@@ -24,6 +25,10 @@ const joinRequestSchema = new Schema<IJoinRequest>(
       type: String,
       enum: ["pending", "accepted", "rejected"],
       default: "pending",
+    },
+    message: {
+    type: String,
+    maxlength: 300,
     },
   },
   { timestamps: true }

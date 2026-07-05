@@ -4,6 +4,8 @@ import { User } from "../models/User";
 import { signupSchema, verifyOtpSchema, loginSchema } from "../utils/validators";
 import { generateOTP, getOTPExpiry } from "../utils/otp";
 import { generateToken } from "../utils/jwt";
+import { sendEmail } from "../utils/sendEmail";
+import { otpEmailTemplate } from "../utils/emailTemplates";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -40,7 +42,11 @@ export const signup = async (req: Request, res: Response) => {
       isVerified: false,
     });
 
-    console.log(`OTP for ${email}: ${otp}`);
+    await sendEmail({
+  to: email,
+  subject: "Verify your RideSync account",
+  html: otpEmailTemplate(otp, "verify"),
+});
 
     return res.status(201).json({
       message: "Signup successful. Please verify your email with the OTP sent.",

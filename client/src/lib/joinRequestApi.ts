@@ -1,7 +1,7 @@
 import api from "./axios";
 
-export const createJoinRequestApi = (rideRequestId: string) => {
-  return api.post("/join-requests", { rideRequestId });
+export const createJoinRequestApi = (rideRequestId: string, message?: string) => {
+  return api.post("/join-requests", { rideRequestId, message });
 };
 
 export const getJoinRequestsForRideApi = (rideRequestId: string) => {

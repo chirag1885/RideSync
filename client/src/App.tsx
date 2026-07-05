@@ -13,8 +13,10 @@ import ManageJoinRequestsPage from "./pages/ManageJoinRequestsPage";
 import MyRequestsPage from "./pages/MyRequestsPage";
 import ChatListPage from "./pages/ChatListPage";
 import ChatWindowPage from "./pages/ChatWindowPage";
+import { ThemeProvider } from "./context/ThemeContext";
 function App() {
   return (
+     <ThemeProvider>
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
@@ -83,6 +85,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

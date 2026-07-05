@@ -6,7 +6,7 @@ import { createNotification } from "../utils/notify";
 
 export const createJoinRequest = async (req: Request, res: Response) => {
   try {
-    const { rideRequestId } = req.body;
+    const { rideRequestId, message } = req.body;
 
     if (!rideRequestId) {
       return res.status(400).json({ message: "rideRequestId is required" });
@@ -35,18 +35,19 @@ export const createJoinRequest = async (req: Request, res: Response) => {
     }
 
     const joinRequest = await JoinRequest.create({
-  rideRequest: rideRequestId,
-  requester: req.user?.userId,
-});
+      rideRequest: rideRequestId,
+      requester: req.user?.userId,
+      message,
+    });
 
-await createNotification({
-  recipient: rideRequest.creator.toString(),
-  type: "join_request_received",
-  message: `Someone is interested in your ride to ${rideRequest.destination}`,
-  relatedRideRequest: rideRequest._id.toString(),
-});
+    await createNotification({
+      recipient: rideRequest.creator.toString(),
+      type: "join_request_received",
+      message: `Someone is interested in your ride to ${rideRequest.destination}`,
+      relatedRideRequest: rideRequest._id.toString(),
+    });
 
-return res.status(201).json({ message: "Join request sent", joinRequest });
+    return res.status(201).json({ message: "Join request sent", joinRequest });
   } catch (error) {
     console.error("Create join request error:", error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -102,20 +103,20 @@ export const respondToJoinRequest = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "This request has already been responded to" });
     }
 
-joinRequest.status = action === "accept" ? "accepted" : "rejected";
-await joinRequest.save();
+    joinRequest.status = action === "accept" ? "accepted" : "rejected";
+    await joinRequest.save();
 
-await createNotification({
-  recipient: joinRequest.requester.toString(),
-  type: action === "accept" ? "join_request_accepted" : "join_request_rejected",
-  message:
-    action === "accept"
-      ? `Your request to join the ride to ${rideRequest.destination} was accepted!`
-      : `Your request to join the ride to ${rideRequest.destination} was rejected`,
-  relatedRideRequest: rideRequest._id.toString(),
-});
+    await createNotification({
+      recipient: joinRequest.requester.toString(),
+      type: action === "accept" ? "join_request_accepted" : "join_request_rejected",
+      message:
+        action === "accept"
+          ? `Your request to join the ride to ${rideRequest.destination} was accepted!`
+          : `Your request to join the ride to ${rideRequest.destination} was rejected`,
+      relatedRideRequest: rideRequest._id.toString(),
+    });
 
-let chat = null;
+    let chat = null;
     if (action === "accept") {
       chat = await Chat.findOne({
         rideRequest: rideRequest._id,

@@ -3,8 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 import { loginApi } from "../lib/authApi";
 import { useAuth } from "../context/AuthContext";
+import AuthLayout from "../components/AuthLayout";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -39,55 +42,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-        <p className="text-sm text-gray-500 mb-6">Log in to RideSync</p>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">College Email</label>
+    <AuthLayout title="Welcome back" subtitle="Log in to find your next shared ride">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+            College Email
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
             <input
               {...register("email")}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 rounded-xl border border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-50 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 placeholder:text-surface-400"
               placeholder="you@thapar.edu"
             />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
+          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <div>
+          <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+            Password
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
             <input
               type="password"
               {...register("password")}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 rounded-xl border border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-50 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 placeholder:text-surface-400"
               placeholder="Your password"
             />
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>
+          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+        </div>
 
-          {loginMutation.isError && (
-            <p className="text-red-500 text-sm">
-              {(loginMutation.error as any)?.response?.data?.message || "Login failed"}
-            </p>
-          )}
+        {loginMutation.isError && (
+          <p className="text-red-500 text-sm">
+            {(loginMutation.error as any)?.response?.data?.message || "Login failed"}
+          </p>
+        )}
 
-          <button
-            type="submit"
-            disabled={loginMutation.isPending}
-            className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium rounded-lg py-2.5 text-sm transition"
-          >
-            {loginMutation.isPending ? "Logging in..." : "Log In"}
-          </button>
-        </form>
+        <motion.button
+          type="submit"
+          disabled={loginMutation.isPending}
+          whileTap={{ scale: 0.98 }}
+          className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 disabled:opacity-50 text-white font-semibold rounded-xl py-2.5 text-sm shadow-lg shadow-brand-500/25 transition"
+        >
+          {loginMutation.isPending ? "Logging in..." : "Log In"}
+          {!loginMutation.isPending && <ArrowRight className="w-4 h-4" />}
+        </motion.button>
+      </form>
 
-        <p className="text-sm text-gray-500 mt-6 text-center">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-purple-600 font-medium hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="text-sm text-surface-500 dark:text-surface-400 mt-6 text-center">
+        Don't have an account?{" "}
+        <Link to="/signup" className="text-brand-600 dark:text-brand-400 font-semibold hover:underline">
+          Sign up
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }
