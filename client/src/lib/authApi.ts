@@ -35,3 +35,20 @@ export const loginApi = (data: LoginPayload) => {
 export const getMeApi = () => {
   return api.get("/auth/me");
 };
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
+
+export const forgotPasswordApi = (data: ForgotPasswordPayload) => {
+  return api.post("/auth/forgot-password", data);
+};
+
+export const resetPasswordApi = (data: ResetPasswordPayload) => {
+  return api.post("/auth/reset-password", data);
+};

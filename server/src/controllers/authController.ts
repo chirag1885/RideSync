@@ -6,6 +6,7 @@ import { generateOTP, getOTPExpiry } from "../utils/otp";
 import { generateToken } from "../utils/jwt";
 import { sendEmail } from "../utils/sendEmail";
 import { otpEmailTemplate } from "../utils/emailTemplates";
+import { forgotPasswordSchema, resetPasswordSchema } from "../utils/validators";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -158,6 +159,88 @@ export const getMe = async (req: Request, res: Response) => {
     return res.status(200).json({ user });
   } catch (error) {
     console.error("Get me error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    const { email } = parsed.data;
+
+    const user = await User.findOne({ email });
+    // Always respond the same way whether or not the user exists — avoids leaking which emails are registered
+    if (!user) {
+      return res.status(200).json({
+        message: "If that email is registered, a reset code has been sent.",
+      });
+    }
+
+    const otp = generateOTP();
+    const otpExpiresAt = getOTPExpiry();
+
+    user.otp = otp;
+    user.otpExpiresAt = otpExpiresAt;
+    await user.save();
+
+    await sendEmail({
+      to: email,
+      subject: "Reset your RideSync password",
+      html: otpEmailTemplate(otp, "reset"),
+    });
+
+    return res.status(200).json({
+      message: "If that email is registered, a reset code has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    const { email, otp, newPassword } = parsed.data;
+
+    const user = await User.findOne({ email }).select("+otp +otpExpiresAt +password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.otp || !user.otpExpiresAt) {
+      return res.status(400).json({ message: "No reset code found, please request a new one" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid reset code" });
+    }
+
+    if (user.otpExpiresAt < new Date()) {
+      return res.status(400).json({ message: "Reset code has expired" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.otp = undefined;
+    user.otpExpiresAt = undefined;
+    await user.save();
+
+    return res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Reset password error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };

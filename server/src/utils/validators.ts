@@ -38,3 +38,12 @@ export const createRideRequestSchema = z.object({
   genderPreference: z.enum(["anyone", "men", "women"]).default("anyone"),
   notes: z.string().max(300).optional(),
 });
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().length(6),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+});

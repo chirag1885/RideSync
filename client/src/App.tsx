@@ -14,6 +14,8 @@ import MyRequestsPage from "./pages/MyRequestsPage";
 import ChatListPage from "./pages/ChatListPage";
 import ChatWindowPage from "./pages/ChatWindowPage";
 import { ThemeProvider } from "./context/ThemeContext";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 function App() {
   return (
      <ThemeProvider>
@@ -26,6 +28,8 @@ function App() {
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+<Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard"
             element={
