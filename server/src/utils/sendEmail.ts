@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import * as brevo from "@getbrevo/brevo";
 
 interface SendEmailParams {
   to: string;
@@ -7,15 +7,17 @@ interface SendEmailParams {
 }
 
 export const sendEmail = async ({ to, subject, html }: SendEmailParams) => {
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const apiInstance = new brevo.TransactionalEmailsApi();
+  apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY || "");
+
+  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  sendSmtpEmail.subject = subject;
+  sendSmtpEmail.htmlContent = html;
+  sendSmtpEmail.sender = { name: "RideSync", email: process.env.BREVO_SENDER_EMAIL || "" };
+  sendSmtpEmail.to = [{ email: to }];
 
   try {
-    await resend.emails.send({
-      from: "RideSync <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
-    });
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
   } catch (error) {
     console.error("Failed to send email:", error);
     throw new Error("Failed to send email");
