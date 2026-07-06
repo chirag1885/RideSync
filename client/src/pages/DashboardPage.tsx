@@ -13,6 +13,7 @@ interface RideRequestData {
   destination: string;
   travelDateTime: string;
   peopleNeeded: number;
+  seatsRemaining?: number;
   genderPreference: "anyone" | "men" | "women";
   creator: {
     _id: string;
@@ -169,6 +170,7 @@ export default function DashboardPage() {
               destination={r.destination}
               travelDateTime={r.travelDateTime}
               peopleNeeded={r.peopleNeeded}
+              seatsRemaining={r.seatsRemaining}
               genderPreference={r.genderPreference}
               creatorName={r.creator?.name || "Unknown"}
             />

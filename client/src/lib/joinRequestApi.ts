@@ -15,3 +15,6 @@ export const respondToJoinRequestApi = (id: string, action: "accept" | "reject")
 export const getMyJoinRequestsApi = () => {
   return api.get("/join-requests/my-requests");
 };
+export const removeParticipantApi = (id: string) => {
+  return api.delete(`/join-requests/${id}/remove`);
+};

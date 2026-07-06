@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Navigation, Clock3, CheckCircle2, XCircle, Inbox } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, Clock3, CheckCircle2, XCircle, Inbox, UserX } from "lucide-react";
 import { getMyJoinRequestsApi } from "../lib/joinRequestApi";
 
 interface MyJoinRequestData {
   _id: string;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "removed";
   message?: string;
   rideRequest: {
     _id: string;
@@ -34,6 +34,11 @@ const statusConfig = {
     label: "Rejected",
     icon: XCircle,
     className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  },
+  removed: {
+    label: "Removed",
+    icon: UserX,
+    className: "bg-surface-200 text-surface-600 dark:bg-surface-800 dark:text-surface-400",
   },
 };
 
@@ -84,43 +89,43 @@ export default function MyRequestsPage() {
           {requests
             .filter((jr) => jr.rideRequest)
             .map((jr, index) => {
-            const config = statusConfig[jr.status];
-            const StatusIcon = config.icon;
-            return (
-              <motion.div
-                key={jr._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-              >
-                <Link
-                  to={`/ride-requests/${jr.rideRequest?._id}`}
-                  className="block bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl rounded-2xl border border-surface-200/60 dark:border-surface-800 shadow-sm hover:shadow-md transition-shadow p-5"
+              const config = statusConfig[jr.status];
+              const StatusIcon = config.icon;
+              return (
+                <motion.div
+                  key={jr._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="text-xs text-surface-400 dark:text-surface-500 flex items-center gap-1.5">
-                        <MapPin className="w-3 h-3" /> {jr.rideRequest?.pickup}
-                      </p>
-                      <p className="font-bold text-surface-900 dark:text-surface-50 flex items-center gap-1.5 mt-0.5">
-                        <Navigation className="w-4 h-4 text-brand-500 dark:text-brand-400" />
-                        {jr.rideRequest?.destination}
-                      </p>
+                  <Link
+                    to={`/ride-requests/${jr.rideRequest?._id}`}
+                    className="block bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl rounded-2xl border border-surface-200/60 dark:border-surface-800 shadow-sm hover:shadow-md transition-shadow p-5"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="text-xs text-surface-400 dark:text-surface-500 flex items-center gap-1.5">
+                          <MapPin className="w-3 h-3" /> {jr.rideRequest?.pickup}
+                        </p>
+                        <p className="font-bold text-surface-900 dark:text-surface-50 flex items-center gap-1.5 mt-0.5">
+                          <Navigation className="w-4 h-4 text-brand-500 dark:text-brand-400" />
+                          {jr.rideRequest?.destination}
+                        </p>
+                      </div>
+                      <span
+                        className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${config.className}`}
+                      >
+                        <StatusIcon className="w-3 h-3" />
+                        {config.label}
+                      </span>
                     </div>
-                    <span
-                      className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${config.className}`}
-                    >
-                      <StatusIcon className="w-3 h-3" />
-                      {config.label}
-                    </span>
-                  </div>
-                  <p className="text-sm text-surface-500 dark:text-surface-400">
-                    Posted by {jr.rideRequest?.creator?.name}
-                  </p>
-                </Link>
-              </motion.div>
-            );
-          })}
+                    <p className="text-sm text-surface-500 dark:text-surface-400">
+                      Posted by {jr.rideRequest?.creator?.name}
+                    </p>
+                  </Link>
+                </motion.div>
+              );
+            })}
         </div>
       </div>
     </div>

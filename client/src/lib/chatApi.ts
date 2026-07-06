@@ -11,3 +11,6 @@ export const getChatMessagesApi = (chatId: string) => {
 export const sendMessageApi = (chatId: string, content: string) => {
   return api.post(`/chats/${chatId}/messages`, { content });
 };
+export const getChatContactApi = (chatId: string) => {
+  return api.get(`/chats/${chatId}/contact`);
+};

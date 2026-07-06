@@ -4,8 +4,9 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-import { User, GraduationCap, Hash, Phone, FileText, Save, Star, MapPin, Calendar } from "lucide-react";
+import { User, GraduationCap, Hash, Phone, FileText, Save, Star, MapPin, Calendar, MessageSquare } from "lucide-react";
 import { getProfileApi, updateProfileApi } from "../lib/userApi";
+import { getReviewsForUserApi } from "../lib/reviewApi";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -70,6 +71,14 @@ export default function ProfilePage() {
   const joinedDate = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-IN", { month: "long", year: "numeric" })
     : "";
+
+  const { data: reviewsData } = useQuery({
+    queryKey: ["myReviews", user?._id],
+    queryFn: () => getReviewsForUserApi(user._id),
+    enabled: !!user?._id,
+  });
+
+  const reviews = reviewsData?.data?.reviews || [];
 
   if (isLoading) {
     return (
@@ -163,7 +172,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl rounded-3xl border border-surface-200/60 dark:border-surface-800 shadow-xl shadow-surface-900/5 dark:shadow-none p-8 mb-12"
+          className="bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl rounded-3xl border border-surface-200/60 dark:border-surface-800 shadow-xl shadow-surface-900/5 dark:shadow-none p-8 mb-8"
         >
           <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50 mb-5">Edit Details</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -238,6 +247,62 @@ export default function ProfilePage() {
             </motion.button>
           </form>
         </motion.div>
+
+        {/* Reviews */}
+        {reviews.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl rounded-3xl border border-surface-200/60 dark:border-surface-800 shadow-xl shadow-surface-900/5 dark:shadow-none p-8 mb-12"
+          >
+            <h2 className="text-lg font-bold text-surface-900 dark:text-surface-50 mb-5 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+              Reviews ({reviews.length})
+            </h2>
+            <div className="space-y-4">
+              {reviews.map((review: any) => (
+                <div
+                  key={review._id}
+                  className="border-b border-surface-100 dark:border-surface-800 last:border-0 pb-4 last:pb-0"
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="font-semibold text-sm text-surface-900 dark:text-surface-50">
+                      {review.reviewer?.name}
+                    </p>
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-3.5 h-3.5 ${
+                            star <= review.rating
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-surface-200 dark:text-surface-700"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {review.reviewText && (
+                    <p className="text-sm text-surface-600 dark:text-surface-300 mb-2">"{review.reviewText}"</p>
+                  )}
+                  {review.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {review.tags.map((tag: string) => (
+                        <span
+                          key={tag}
+                          className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-surface-100 dark:bg-surface-800 text-surface-500 dark:text-surface-400"
+                        >
+                          {tag.replace(/_/g, " ")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

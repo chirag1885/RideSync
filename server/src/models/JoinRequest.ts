@@ -3,7 +3,7 @@ import mongoose, { Document, Schema, Types } from "mongoose";
 export interface IJoinRequest extends Document {
   rideRequest: Types.ObjectId;
   requester: Types.ObjectId;
-  status: "pending" | "accepted" | "rejected";
+ status: "pending" | "accepted" | "rejected" | "removed";
   createdAt: Date;
   updatedAt: Date;
   message?: string;
@@ -22,9 +22,9 @@ const joinRequestSchema = new Schema<IJoinRequest>(
       required: true,
     },
     status: {
-      type: String,
-      enum: ["pending", "accepted", "rejected"],
-      default: "pending",
+        type: String,
+        enum: ["pending", "accepted", "rejected", "removed"],
+        default: "pending",
     },
     message: {
     type: String,

@@ -9,6 +9,7 @@ interface RideCardProps {
   destination: string;
   travelDateTime: string;
   peopleNeeded: number;
+  seatsRemaining?: number;
   genderPreference: "anyone" | "men" | "women";
   creatorName: string;
 }
@@ -32,6 +33,7 @@ export default function RideCard({
   destination,
   travelDateTime,
   peopleNeeded,
+  seatsRemaining,
   genderPreference,
   creatorName,
 }: RideCardProps) {
@@ -44,6 +46,9 @@ export default function RideCard({
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
+  const remaining = seatsRemaining ?? peopleNeeded;
+  const isFull = remaining <= 0;
 
   return (
     <motion.div
@@ -81,9 +86,13 @@ export default function RideCard({
 
         <div className="flex justify-between items-center text-sm text-surface-500 dark:text-surface-400 mb-4 pb-4 border-b border-surface-100 dark:border-surface-800">
           <span>{formattedDate} · {formattedTime}</span>
-          <span className="flex items-center gap-1">
+          <span
+            className={`flex items-center gap-1 font-semibold ${
+              isFull ? "text-red-500 dark:text-red-400" : "text-green-600 dark:text-green-400"
+            }`}
+          >
             <Users2 className="w-3.5 h-3.5" />
-            {peopleNeeded} needed
+            {isFull ? "Full" : `${remaining} left`}
           </span>
         </div>
 

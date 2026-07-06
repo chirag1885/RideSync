@@ -47,3 +47,10 @@ export const resetPasswordSchema = z.object({
   otp: z.string().length(6),
   newPassword: z.string().min(6, "Password must be at least 6 characters"),
 });
+export const createReviewSchema = z.object({
+  rideRequestId: z.string(),
+  revieweeId: z.string(),
+  rating: z.number().min(1).max(5),
+  reviewText: z.string().max(300).optional(),
+  tags: z.array(z.enum(["friendly", "on_time", "safe", "good_communication", "would_travel_again"])).optional(),
+});

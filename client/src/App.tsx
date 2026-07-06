@@ -16,6 +16,8 @@ import ChatWindowPage from "./pages/ChatWindowPage";
 import { ThemeProvider } from "./context/ThemeContext";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import LandingPage from "./pages/LandingPage";
+import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   return (
      <ThemeProvider>
@@ -23,13 +25,14 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 <Route path="/reset-password" element={<ResetPasswordPage />} />
+
           <Route
             path="/dashboard"
             element={
@@ -86,6 +89,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+<Route path="*" element={<NotFoundPage />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

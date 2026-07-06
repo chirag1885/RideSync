@@ -1,3 +1,4 @@
+import { Message } from "../models/Message";
 import { Request, Response } from "express";
 import { JoinRequest } from "../models/JoinRequest";
 import { RideRequest } from "../models/RideRequest";
@@ -152,6 +153,52 @@ export const getMyJoinRequests = async (req: Request, res: Response) => {
     return res.status(200).json({ joinRequests });
   } catch (error) {
     console.error("Get my join requests error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+export const removeAcceptedParticipant = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const joinRequest = await JoinRequest.findById(id).populate("rideRequest");
+    if (!joinRequest) {
+      return res.status(404).json({ message: "Join request not found" });
+    }
+
+    const rideRequest = joinRequest.rideRequest as any;
+
+    if (rideRequest.creator.toString() !== req.user?.userId) {
+      return res.status(403).json({ message: "Only the creator can remove a participant" });
+    }
+
+    if (joinRequest.status !== "accepted") {
+      return res.status(400).json({ message: "Only accepted participants can be removed" });
+    }
+
+    joinRequest.status = "removed";
+    await joinRequest.save();
+
+    // Clean up the chat tied to this specific match
+    const chat = await Chat.findOne({
+      rideRequest: rideRequest._id,
+      participants: { $all: [rideRequest.creator, joinRequest.requester] },
+    });
+
+    if (chat) {
+      await Message.deleteMany({ chat: chat._id });
+      await Chat.deleteOne({ _id: chat._id });
+    }
+
+    await createNotification({
+      recipient: joinRequest.requester.toString(),
+      type: "join_request_rejected",
+      message: `You were removed from the ride to ${rideRequest.destination}`,
+      relatedRideRequest: rideRequest._id.toString(),
+    });
+
+    return res.status(200).json({ message: "Participant removed" });
+  } catch (error) {
+    console.error("Remove participant error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };

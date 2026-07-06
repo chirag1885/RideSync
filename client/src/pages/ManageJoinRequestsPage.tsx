@@ -1,12 +1,13 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, X, MessageSquare, Inbox as InboxIcon } from "lucide-react";
-import { getJoinRequestsForRideApi, respondToJoinRequestApi } from "../lib/joinRequestApi";
+import { ArrowLeft, Check, X, MessageSquare, Inbox as InboxIcon, UserX } from "lucide-react";
+import { getJoinRequestsForRideApi, respondToJoinRequestApi, removeParticipantApi } from "../lib/joinRequestApi";
 
 interface JoinRequestData {
   _id: string;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "removed";
   message?: string;
   requester: {
     _id: string;
@@ -20,6 +21,7 @@ interface JoinRequestData {
 export default function ManageJoinRequestsPage() {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["joinRequestsForRide", id],
@@ -32,6 +34,14 @@ export default function ManageJoinRequestsPage() {
       respondToJoinRequestApi(requestId, action),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["joinRequestsForRide", id] });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: (requestId: string) => removeParticipantApi(requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["joinRequestsForRide", id] });
+      setConfirmRemoveId(null);
     },
   });
 
@@ -145,23 +155,61 @@ export default function ManageJoinRequestsPage() {
               {resolved.map((jr) => (
                 <div
                   key={jr._id}
-                  className="flex items-center justify-between bg-white/50 dark:bg-surface-900/50 rounded-xl border border-surface-200/60 dark:border-surface-800 px-4 py-3"
+                  className="bg-white/50 dark:bg-surface-900/50 rounded-xl border border-surface-200/60 dark:border-surface-800 px-4 py-3"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-surface-200 dark:bg-surface-800 flex items-center justify-center text-xs font-bold text-surface-500 dark:text-surface-400">
-                      {initialsOf(jr.requester?.name)}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-surface-200 dark:bg-surface-800 flex items-center justify-center text-xs font-bold text-surface-500 dark:text-surface-400">
+                        {initialsOf(jr.requester?.name)}
+                      </div>
+                      <p className="text-sm text-surface-700 dark:text-surface-300">{jr.requester?.name}</p>
                     </div>
-                    <p className="text-sm text-surface-700 dark:text-surface-300">{jr.requester?.name}</p>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${
+                          jr.status === "accepted"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                            : jr.status === "removed"
+                            ? "bg-surface-200 text-surface-600 dark:bg-surface-700 dark:text-surface-300"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        }`}
+                      >
+                        {jr.status}
+                      </span>
+                      {jr.status === "accepted" && (
+                        <button
+                          onClick={() => setConfirmRemoveId(jr._id)}
+                          className="text-xs font-medium text-red-500 dark:text-red-400 hover:underline flex items-center gap-1"
+                        >
+                          <UserX className="w-3.5 h-3.5" />
+                          Remove
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${
-                      jr.status === "accepted"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                    }`}
-                  >
-                    {jr.status}
-                  </span>
+
+                  {confirmRemoveId === jr._id && (
+                    <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-800 flex items-center justify-between">
+                      <p className="text-xs text-surface-500 dark:text-surface-400">
+                        Remove {jr.requester?.name}? Their chat will be deleted too.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setConfirmRemoveId(null)}
+                          className="text-xs text-surface-500 dark:text-surface-400 px-2 py-1"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => removeMutation.mutate(jr._id)}
+                          disabled={removeMutation.isPending}
+                          className="text-xs font-medium text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg"
+                        >
+                          {removeMutation.isPending ? "Removing..." : "Confirm"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -1,9 +1,10 @@
+import { JoinRequest } from "../models/JoinRequest";
 import { Request, Response } from "express";
 import { RideRequest } from "../models/RideRequest";
 import { createRideRequestSchema } from "../utils/validators";
-import { JoinRequest } from "../models/JoinRequest";
 import { Chat } from "../models/Chat";
 import { Message } from "../models/Message";
+
 
 export const createRideRequest = async (req: Request, res: Response) => {
   try {
@@ -47,11 +48,13 @@ export const getRideRequests = async (req: Request, res: Response) => {
 
     const sortOrder = sort === "oldest" ? 1 : -1;
 
-    const rideRequests = await RideRequest.find(filter)
-      .populate("creator", "name profilePicture branch year rating")
-      .sort({ createdAt: sortOrder });
+const rideRequests = await RideRequest.find(filter)
+  .populate("creator", "name profilePicture branch year rating")
+  .sort({ createdAt: sortOrder });
 
-    return res.status(200).json({ rideRequests });
+const withSeats = await Promise.all(rideRequests.map(attachSeatsInfo));
+
+return res.status(200).json({ rideRequests: withSeats });
   } catch (error) {
     console.error("Get ride requests error:", error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -61,15 +64,17 @@ export const getRideRequests = async (req: Request, res: Response) => {
 export const getRideRequestById = async (req: Request, res: Response) => {
   try {
     const rideRequest = await RideRequest.findById(req.params.id).populate(
-      "creator",
-      "name profilePicture branch year rating"
-    );
+  "creator",
+  "name profilePicture branch year rating"
+);
 
-    if (!rideRequest) {
-      return res.status(404).json({ message: "Ride request not found" });
-    }
+if (!rideRequest) {
+  return res.status(404).json({ message: "Ride request not found" });
+}
 
-    return res.status(200).json({ rideRequest });
+const withSeats = await attachSeatsInfo(rideRequest);
+
+return res.status(200).json({ rideRequest: withSeats });
   } catch (error) {
     console.error("Get ride request by id error:", error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -102,4 +107,12 @@ export const deleteRideRequest = async (req: Request, res: Response) => {
     console.error("Delete ride request error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
+};
+const attachSeatsInfo = async (ride: any) => {
+  const acceptedCount = await JoinRequest.countDocuments({
+    rideRequest: ride._id,
+    status: "accepted",
+  });
+  const seatsRemaining = Math.max(ride.peopleNeeded - acceptedCount, 0);
+  return { ...ride.toObject(), acceptedCount, seatsRemaining };
 };

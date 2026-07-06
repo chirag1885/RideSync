@@ -9,6 +9,7 @@ import rideRequestRoutes from "./routes/rideRequestRoutes";
 import joinRequestRoutes from "./routes/joinRequestRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import reviewRoutes from "./routes/reviewRoutes";
 dotenv.config();
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api/ride-requests", rideRequestRoutes);
 app.use("/api/join-requests", joinRequestRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 

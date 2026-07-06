@@ -274,14 +274,34 @@ export default function RideRequestDetailsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
-                  <Users2 className="w-4 h-4 text-surface-500 dark:text-surface-400" />
-                </div>
-                <div>
-                  <p className="text-xs text-surface-400 dark:text-surface-500">People Needed</p>
-                  <p className="text-sm font-semibold text-surface-900 dark:text-surface-50">{r.peopleNeeded}</p>
-                </div>
-              </div>
+  <div
+    className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+      (r.seatsRemaining ?? r.peopleNeeded) <= 0
+        ? "bg-red-50 dark:bg-red-500/10"
+        : "bg-green-50 dark:bg-green-500/10"
+    }`}
+  >
+    <Users2
+      className={`w-4 h-4 ${
+        (r.seatsRemaining ?? r.peopleNeeded) <= 0
+          ? "text-red-500 dark:text-red-400"
+          : "text-green-600 dark:text-green-400"
+      }`}
+    />
+  </div>
+  <div>
+    <p className="text-xs text-surface-400 dark:text-surface-500">Seats</p>
+    <p
+      className={`text-sm font-semibold ${
+        (r.seatsRemaining ?? r.peopleNeeded) <= 0
+          ? "text-red-500 dark:text-red-400"
+          : "text-green-600 dark:text-green-400"
+      }`}
+    >
+      {(r.seatsRemaining ?? r.peopleNeeded) <= 0 ? "Full" : `${r.seatsRemaining} left`}
+    </p>
+  </div>
+</div>
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
                   <GraduationCap className="w-4 h-4 text-surface-500 dark:text-surface-400" />
