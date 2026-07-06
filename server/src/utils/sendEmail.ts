@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 interface SendEmailParams {
   to: string;
@@ -7,17 +7,11 @@ interface SendEmailParams {
 }
 
 export const sendEmail = async ({ to, subject, html }: SendEmailParams) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
-    await transporter.sendMail({
-      from: `"RideSync" <${process.env.GMAIL_USER}>`,
+    await resend.emails.send({
+      from: "RideSync <onboarding@resend.dev>",
       to,
       subject,
       html,
