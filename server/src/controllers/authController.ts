@@ -7,7 +7,13 @@ import { generateToken } from "../utils/jwt";
 import { sendEmail } from "../utils/sendEmail";
 import { otpEmailTemplate } from "../utils/emailTemplates";
 import { forgotPasswordSchema, resetPasswordSchema } from "../utils/validators";
-
+import { changePasswordSchema } from "../utils/validators";
+import { RideRequest } from "../models/RideRequest";
+import { JoinRequest } from "../models/JoinRequest";
+import { Chat } from "../models/Chat";
+import { Message } from "../models/Message";
+import { Review } from "../models/Review";
+import { Notification } from "../models/Notification";
 export const signup = async (req: Request, res: Response) => {
   try {
     const parsed = signupSchema.safeParse(req.body);
@@ -241,6 +247,62 @@ export const resetPassword = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     console.error("Reset password error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const parsed = changePasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    const { currentPassword, newPassword } = parsed.data;
+
+    const user = await User.findById(req.user?.userId).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+export const deleteAccount = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    // Clean up everything tied to this user across collections
+    const myRideRequests = await RideRequest.find({ creator: userId });
+    const rideRequestIds = myRideRequests.map((r) => r._id);
+
+    const myChats = await Chat.find({ participants: userId });
+    const chatIds = myChats.map((c) => c._id);
+
+    await Message.deleteMany({ chat: { $in: chatIds } });
+    await Chat.deleteMany({ participants: userId });
+    await JoinRequest.deleteMany({ $or: [{ requester: userId }, { rideRequest: { $in: rideRequestIds } }] });
+    await Review.deleteMany({ $or: [{ reviewer: userId }, { reviewee: userId }] });
+    await Notification.deleteMany({ recipient: userId });
+    await RideRequest.deleteMany({ creator: userId });
+    await User.findByIdAndDelete(userId);
+
+    return res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Delete account error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };

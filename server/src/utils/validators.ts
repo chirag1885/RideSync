@@ -54,3 +54,7 @@ export const createReviewSchema = z.object({
   reviewText: z.string().max(300).optional(),
   tags: z.array(z.enum(["friendly", "on_time", "safe", "good_communication", "would_travel_again"])).optional(),
 });
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});

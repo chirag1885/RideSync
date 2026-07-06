@@ -52,3 +52,15 @@ export const forgotPasswordApi = (data: ForgotPasswordPayload) => {
 export const resetPasswordApi = (data: ResetPasswordPayload) => {
   return api.post("/auth/reset-password", data);
 };
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export const changePasswordApi = (data: ChangePasswordPayload) => {
+  return api.post("/auth/change-password", data);
+};
+
+export const deleteAccountApi = () => {
+  return api.delete("/auth/delete-account");
+};

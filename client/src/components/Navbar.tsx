@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Moon, Sun, LogOut, MessageCircle, Inbox, Plus, User } from "lucide-react";
+import { Bell, Moon, Sun, LogOut, MessageCircle, Inbox, Plus, User, Settings } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getMyNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi } from "../lib/notificationApi";
 import { useTheme } from "../context/ThemeContext";
@@ -205,6 +205,12 @@ export default function Navbar() {
             >
               <User className="w-5 h-5" />
             </Link>
+            <Link
+  to="/settings"
+  className="w-10 h-10 flex items-center justify-center rounded-full text-surface-500 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 transition"
+>
+  <Settings className="w-5 h-5" />
+</Link>
 
             <button
               onClick={handleLogout}
