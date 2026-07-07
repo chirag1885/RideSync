@@ -147,7 +147,12 @@ That's it. RideSync's job ends the moment two people are connected — no ride t
 
 ## 📸 Screenshots
 
-> _Add screenshots or a short GIF walkthrough here — Dashboard, Ride Details, Chat, and Dark Mode side-by-side make for a great showcase._
+<img width="1877" height="738" alt="image" src="https://github.com/user-attachments/assets/96a8e82d-3cdd-4881-82c3-8582965db7db" />
+<img width="1507" height="807" alt="image" src="https://github.com/user-attachments/assets/aa6e016a-b58e-4928-acea-cbdef4baaaf6" />
+<img width="1230" height="870" alt="image" src="https://github.com/user-attachments/assets/d8d3b564-3941-4e66-8348-b59676a5cb6a" />
+<img width="722" height="611" alt="image" src="https://github.com/user-attachments/assets/6f44407b-a98b-486e-b79c-9d2cf6d17469" />
+
+
 
 ---
 
